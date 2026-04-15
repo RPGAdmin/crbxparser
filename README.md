@@ -15,6 +15,11 @@ Wird keine Ausgabedatei angegeben, wird der Dateiname der Eingabedatei mit der E
 python parse_sia451.py SIA451.01S
 # erzeugt SIA451.csv
 ```
+**Beispiel Excel
+``` bash
+python parse_sia451_excel.py SIA451.01S
+# erzeugt SIA451.xlsx
+```
 
 ## Ausgabe
 
