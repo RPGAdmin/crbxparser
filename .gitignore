@@ -1,0 +1,7 @@
+# SIA 451 Quelldateien
+*.01S
+*.e1s
+
+# Generierte Ausgabedateien
+*.csv
+*.xlsx
