@@ -5,7 +5,7 @@ Konvertiert SIA 451 / CRBX Leistungsverzeichnisse (`.01S`, `.e1s`) in CSV.
 ## Verwendung
 
 ```bash
-python parse_sia451_excel.py SIA451.01S
+python parse_sia451.py <Eingabedatei> [Ausgabedatei.csv]
 ```
 
 Wird keine Ausgabedatei angegeben, wird der Dateiname der Eingabedatei mit der Endung `.csv` verwendet.
