@@ -141,20 +141,10 @@ def build_workbook(positions: list[dict]) -> Workbook:
     write_header(ws)
     ws.freeze_panes = "A2"
 
-    current_section = None
     row = 2
     alt = False
 
     for pos in positions:
-        section = pos["Abschnitt"]
-
-        # Abschnitts-Trennzeile beim Wechsel
-        if section != current_section:
-            write_section_row(ws, row, section)
-            current_section = section
-            row += 1
-            alt = False
-
         write_data_row(ws, row, pos, alt)
         row += 1
         alt = not alt
