@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIA 451 Parser</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Calibri, Segoe UI, Arial, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(31,78,121,.12);
+      padding: 2.5rem 2.8rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      margin-bottom: 1.8rem;
+    }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: #1F4E79;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.3rem; font-weight: bold;
+    }
+    .logo-text { font-size: 1.2rem; font-weight: 700; color: #1F4E79; }
+    .logo-sub  { font-size: .78rem; color: #6b8cae; margin-top: 1px; }
+
+    h1 { font-size: 1.15rem; color: #1F4E79; margin-bottom: .3rem; }
+    p.subtitle { font-size: .85rem; color: #6b8cae; margin-bottom: 1.6rem; }
+
+    label { display: block; font-size: .85rem; font-weight: 600;
+            color: #2c4a6e; margin-bottom: .35rem; }
+
+    input[type="text"] {
+      width: 100%; padding: .6rem .85rem;
+      border: 1.5px solid #b8d0e8; border-radius: 6px;
+      font-size: .95rem; color: #1a2e42;
+      outline: none; transition: border-color .2s;
+      margin-bottom: 1.2rem;
+    }
+    input[type="text"]:focus { border-color: #1F4E79; }
+
+    .dropzone {
+      border: 2px dashed #b8d0e8;
+      border-radius: 8px;
+      padding: 1.8rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      margin-bottom: 1.4rem;
+      position: relative;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: #1F4E79; background: #eaf2fb;
+    }
+    .dropzone input[type="file"] {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      opacity: 0; cursor: pointer;
+    }
+    .dropzone-icon { font-size: 2rem; color: #6b8cae; margin-bottom: .4rem; }
+    .dropzone-label { font-size: .9rem; color: #4a6a8a; }
+    .dropzone-hint  { font-size: .75rem; color: #a0b8cc; margin-top: .25rem; }
+    .file-name { font-size: .82rem; color: #1F4E79; font-weight: 600;
+                 margin-top: .5rem; word-break: break-all; }
+
+    .btn {
+      width: 100%; padding: .75rem;
+      background: #1F4E79; color: #fff;
+      border: none; border-radius: 7px;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: background .2s;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+    }
+    .btn:hover { background: #163a5e; }
+    .btn:disabled { background: #8aadcc; cursor: not-allowed; }
+
+    .alerts { margin-bottom: 1rem; }
+    .alert {
+      background: #fdecea; color: #b71c1c;
+      border: 1px solid #f5c6cb; border-radius: 6px;
+      padding: .6rem .9rem; font-size: .85rem; margin-bottom: .5rem;
+    }
+
+    .spinner { display: none; width: 18px; height: 18px;
+      border: 3px solid rgba(255,255,255,.4);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">S</div>
+    <div>
+      <div class="logo-text">SIA 451 Parser</div>
+      <div class="logo-sub">CRBX &rarr; Excel Konverter</div>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="alerts">
+        {% for msg in messages %}
+          <div class="alert">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <form id="parseForm" action="{{ url_for('parse') }}" method="post" enctype="multipart/form-data">
+    <label for="project_name">Projektname</label>
+    <input type="text" id="project_name" name="project_name"
+           placeholder="z.B. Neubau Schulhaus Muster" required />
+
+    <label>Leistungsverzeichnis (.01S)</label>
+    <div class="dropzone" id="dropzone">
+      <input type="file" name="efile" id="efile" accept=".01s,.01S,.crbx" required />
+      <div class="dropzone-icon">&#128196;</div>
+      <div class="dropzone-label">Datei hierher ziehen oder klicken</div>
+      <div class="dropzone-hint">Unterstützt: .01S, .crbx</div>
+      <div class="file-name" id="fileName"></div>
+    </div>
+
+    <button class="btn" type="submit" id="submitBtn">
+      <span class="spinner" id="spinner"></span>
+      Excel herunterladen
+    </button>
+  </form>
+</div>
+
+<script>
+  const fileInput = document.getElementById("efile");
+  const fileName  = document.getElementById("fileName");
+  const dropzone  = document.getElementById("dropzone");
+  const form      = document.getElementById("parseForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const spinner   = document.getElementById("spinner");
+
+  fileInput.addEventListener("change", () => {
+    fileName.textContent = fileInput.files[0]?.name ?? "";
+  });
+
+  dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.classList.add("dragover"); });
+  dropzone.addEventListener("dragleave", ()  => dropzone.classList.remove("dragover"));
+  dropzone.addEventListener("drop",     e  => { e.preventDefault(); dropzone.classList.remove("dragover");
+    if (e.dataTransfer.files.length) {
+      fileInput.files = e.dataTransfer.files;
+      fileName.textContent = fileInput.files[0].name;
+    }
+  });
+
+  form.addEventListener("submit", () => {
+    submitBtn.disabled = true;
+    spinner.style.display = "block";
+    // Re-enable after a few seconds in case of redirect back (error)
+    setTimeout(() => { submitBtn.disabled = false; spinner.style.display = "none"; }, 6000);
+  });
+</script>
+</body>
+</html>

@@ -5,3 +5,40 @@
 # Generierte Ausgabedateien
 *.csv
 *.xlsx
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtuelle Umgebung
+venv/
+.venv/
+env/
+
+# Umgebungsvariablen / Secrets
+.env
+.env.*
+*.secret
+
+# Flask Session / Secret Key (falls ausgelagert)
+instance/
+
+# Temporäre Upload-Dateien
+tmp/
+temp/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Setup-File Ubuntu
+.sh
