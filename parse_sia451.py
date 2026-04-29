@@ -142,7 +142,7 @@ def parse_sia451(filepath: str) -> list[dict]:
             # ------------------------------------------------------------------
             # Level 6 + GP: Menge, Einheitspreis, BKP
             # ------------------------------------------------------------------
-            if level == 6 and gp_flag and len(line) >= 85:
+            if level == 6 and gp_flag and len(line) >= 74:
                 current["Menge"] = parse_qty(line[44:58])
                 current["Einheitspreis"] = parse_price(line[61:74])
                 current["BKP"] = line[81:85].strip()

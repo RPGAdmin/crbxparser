@@ -41,3 +41,18 @@ Die CSV-Datei ist UTF-8 (mit BOM) kodiert und verwendet Semikolon als Trennzeich
 ## Format
 
 Das SIA 451 Format (auch CRBX genannt) ist der Schweizer Standard für den elektronischen Datenaustausch von Leistungsverzeichnissen (Norm SN 509 451). Die Datei ist im DOS-Zeichensatz CP850 kodiert und verwendet ein festes Spaltenformat.
+
+## Wartung
+### Neustart des Programms
+Wenn Änderungen am Code vorgenommen wurden, muss der Service neu gestartet werden:
+``` bash
+sudo systemctl restart crbxparser
+# startet den Service neu
+```
+und kontrollieren, ob der Service läuft:
+``` bash
+sudo systemctl status crbxparser
+# muss active (running) sein
+```
+
+

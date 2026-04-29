@@ -175,12 +175,15 @@ def main():
         print("Keine Positionen gefunden.", file=sys.stderr)
         sys.exit(1)
 
+    priced = [p for p in positions if p.get("Gesamtpreis") is not None]
+    if not priced:
+        print("Warnung: Keine Preise gefunden – Excel wird ohne Preisspalten erstellt.", file=sys.stderr)
+
     wb = build_workbook(positions)
     wb.save(outfile)
 
-    priced = sum(1 for p in positions if p.get("Gesamtpreis") is not None)
-    total  = sum(p["Gesamtpreis"] for p in positions if p.get("Gesamtpreis") is not None)
-    print(f"{len(positions)} Positionen ({priced} mit Preisen), Total CHF {total:,.2f} -> {outfile}")
+    total = sum(p["Gesamtpreis"] for p in priced)
+    print(f"{len(positions)} Positionen ({len(priced)} mit Preisen), Total CHF {total:,.2f} -> {outfile}")
 
 
 if __name__ == "__main__":
